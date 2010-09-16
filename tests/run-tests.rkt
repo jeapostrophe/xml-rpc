@@ -1,7 +1,7 @@
 #lang racket
 (require rackunit/text-ui)
-(require "all-xmlrpc-tests.ss")
+(require "all-xml-rpc-tests.ss")
 
 (print-struct #t)
 
-(run-tests all-xmlrpc-tests)
+(run-tests all-xml-rpc-tests)

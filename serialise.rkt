@@ -74,7 +74,7 @@
   (cond
     [(or (eq? +nan.0 val) (eq? +inf.0 val) (eq? -inf.0 val))
      ;; note that +nan.0 = -nan.0 so we don't check this case
-     (raise-exn:xmlrpc
+     (raise-exn:xml-rpc
       (format "Given ~s to serialise to XML-RPC.  XML-RPC does not allow NaN or infinities; and so this value cannot be serialised" val))]
     [(and (number? val) (inexact? val))
      ;; If I'm correct an inexact number is represented by
@@ -85,7 +85,7 @@
      (if (and (<= val (expt 2 31))
               (>= val (- (expt 2 31))))
          `(value (int ,(number->string val)))
-         (raise-exn:xmlrpc 
+         (raise-exn:xml-rpc 
           (format "The Racket number ~s is out of range for an XML-RPC integer" val)))]
     [(string? val)  `(value (string ,val))]
     ;; 20060711 MCJ
@@ -111,7 +111,7 @@
     [(bytes? val)
      `(value (base64 ,(base64-encode val)))]
     [else
-     (raise-exn:xmlrpc
+     (raise-exn:xml-rpc
       (format "Cannot convert Racket value ~s to XML-RPC" val))]))
 
 ;; deserialise-struct : list-of-SXML -> Racket value
@@ -130,7 +130,7 @@
                   [(member (name ,name) (value ,[deserialise -> v]))
                    (hash-set! h (string->symbol name) v)]
                   [,else
-                   (raise-exn:xmlrpc
+                   (raise-exn:xml-rpc
                     (format "The XML-RPC struct data ~s is badly formed and cannot be converted to Racket" else))]))
      member*)
     h))
@@ -147,7 +147,7 @@
                   (date-time-zone-offset (seconds->date (current-seconds)))])
             (struct-copy date given-date (time-zone-offset tzo))
             ))
-        (raise-exn:xmlrpc
+        (raise-exn:xml-rpc
          (format 
           "The XML-RPC date ~s badly formatted; cannot be converted to Racket" v)))))
 
@@ -194,5 +194,5 @@
              [(array (data ,[value*] ...))
               value*]
              [,else
-              (raise-exn:xmlrpc
+              (raise-exn:xml-rpc
                (format "Cannot convert the XML-RPC type ~s to Racket" else))]))

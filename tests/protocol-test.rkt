@@ -69,7 +69,7 @@
    "All tests for protocol"
    (test-case
     "Method call encoded correctly"
-    (check-equal? (encode-xmlrpc-call "fooBar" 1 2.0 "3")
+    (check-equal? (encode-xml-rpc-call "fooBar" 1 2.0 "3")
                   '(methodCall
                     (methodName "fooBar")
                     (params
@@ -79,29 +79,29 @@
    (test-case
     "Method call written correctly"
     (let ((op (open-output-string)))
-      (write-xmlrpc-call
-       (encode-xmlrpc-call "fooBar" 1 2.0 "3") op)
+      (write-xml-rpc-call
+       (encode-xml-rpc-call "fooBar" 1 2.0 "3") op)
       (check-equal?
        (get-output-string op)
        body-string)))
    (test-case
     "Response with bad HTTP code raises exn"
     (check-exn
-     exn:xmlrpc?
+     exn:xml-rpc?
      (lambda ()
-       (read-xmlrpc-response
+       (read-xml-rpc-response
         (open-input-string "HTTP/1.0 500 Dead\r\n")))))
    (test-case
     "Empty response raises exn"
     (check-exn
-     exn:xmlrpc?
+     exn:xml-rpc?
      (lambda ()
-       (read-xmlrpc-response
+       (read-xml-rpc-response
         (open-input-string "")))))
    (test-case
     "Fault response is parsed correctly and raises exn"
     (let ((resp
-           (read-xmlrpc-response
+           (read-xml-rpc-response
             (open-input-string
              (string-append generic-headers
                             fault-response-string)))))
@@ -120,7 +120,7 @@
    (test-case
     "Successful response is parsed correctly"
     (let ((resp
-           (read-xmlrpc-response
+           (read-xml-rpc-response
             (open-input-string
              (string-append generic-headers
                             successful-response-string)))))
@@ -135,7 +135,7 @@
    (test-case
     "Successful response decoded correctly"
     (check-equal?
-     (decode-xmlrpc-response
+     (decode-xml-rpc-response
       (open-input-string
        (string-append generic-headers
                       successful-response-string)))
@@ -144,13 +144,13 @@
     "Fault response decoded correctly"
     (check-exn
      (lambda (exn)
-       (and (exn:xmlrpc:fault? exn)
-            (check = (exn:xmlrpc:fault-code exn) 4)
+       (and (exn:xml-rpc:fault? exn)
+            (check = (exn:xml-rpc:fault-code exn) 4)
             (check string=?
                    (exn-message exn)
                    "Too many parameters.")))
      (lambda ()
-       (decode-xmlrpc-response
+       (decode-xml-rpc-response
         (open-input-string
          (string-append generic-headers
                         fault-response-string))))))
@@ -161,10 +161,10 @@
         "XML-RPC call timed out." RPC-TIMEOUT
       (check
        string=?
-       (decode-xmlrpc-response
-        (make-xmlrpc-call
+       (decode-xml-rpc-response
+        (make-xml-rpc-call
          (string->url "http://betty.userland.com/RPC2")
-         (encode-xmlrpc-call "examples.getStateName" 40)))
+         (encode-xml-rpc-call "examples.getStateName" 40)))
        "South Carolina")))
    
    (test-case
@@ -174,22 +174,22 @@
         "XML-RPC invalid call timed out." RPC-TIMEOUT
       (check
        string=?
-       (decode-xmlrpc-response
-        (make-xmlrpc-call
+       (decode-xml-rpc-response
+        (make-xml-rpc-call
          (string->url "http://betty.userland.com/RPC2")
-         (encode-xmlrpc-call "examples.getStateName" 60)))
+         (encode-xml-rpc-call "examples.getStateName" 60)))
        "")))
    
    ;; Server-side tests
    (test-case
-    "decode-xmlrpc-call parses call correctly."
+    "decode-xml-rpc-call parses call correctly."
     (check
      (lambda (a b)
        (and (equal? (rpc-call-name a)
                     (rpc-call-name b))
             (equal? (rpc-call-args a)
                     (rpc-call-args b))))
-     (decode-xmlrpc-call body-string)
+     (decode-xml-rpc-call body-string)
      (make-rpc-call 'fooBar (list 1 2.0 "3"))
      ))
    

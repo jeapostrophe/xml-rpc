@@ -245,37 +245,37 @@
    
    (test-case
     "Out-of-range doubles throw exception"
-    (check-exn exn:xmlrpc?
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (serialise +inf.0)))
-    (check-exn exn:xmlrpc?
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (serialise -inf.0)))
-    (check-exn exn:xmlrpc?
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (serialise +nan.0)))
-    (check-exn exn:xmlrpc?
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (serialise -nan.0))))
    
    (test-case
     "Out of range integer throws exception"
-    (check-exn exn:xmlrpc?
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (serialise +inf.0)))
-    (check-exn exn:xmlrpc?
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (serialise -inf.0)))
-    (check-exn exn:xmlrpc?
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (serialise +nan.0)))
-    (check-exn exn:xmlrpc?
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (serialise -nan.0)))
-    (check-exn exn:xmlrpc?
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (serialise (expt 2 32))))
-    (check-exn exn:xmlrpc? 
+    (check-exn exn:xml-rpc? 
                (lambda ()
                  (serialise (- (expt 2 40))))))     
    
@@ -337,27 +337,27 @@
                   ""))
    
    (test-case
-    "Deserialisation of dateTime raises exn:xmlrpc on badly formatted data"
+    "Deserialisation of dateTime raises exn:xml-rpc on badly formatted data"
     (check-exn
-     exn:xmlrpc?
+     exn:xml-rpc?
      (lambda ()
        (deserialise
         '(value (dateTime.iso8601 "990101T09:27:35"))))))
    
    (test-case
-    "Deserialisation raises exn:xmlrpc on error"
-    (check-exn exn:xmlrpc?
+    "Deserialisation raises exn:xml-rpc on error"
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (deserialise '(some crap)))))
    
    (test-case
-    "Incorrect struct raises exn:xmlrpc"
-    (check-exn exn:xmlrpc?
+    "Incorrect struct raises exn:xml-rpc"
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (deserialise
                   '(value (struct
                            (member (name "a")))))))
-    (check-exn exn:xmlrpc?
+    (check-exn exn:xml-rpc?
                (lambda ()
                  (deserialise
                   '(value (struct

@@ -1,16 +1,20 @@
 #lang racket
-(provide (all-defined-out))
+(provide raise-exn:xml-rpc)
 
-;; struct exn:xmlrpc:base : ()
-(struct exn:xmlrpc exn ())
+(struct exn:xml-rpc exn ())
 
-;; struct (exn:xmlrpc:base exn:xmlrpc) : integer
-(struct exn:xmlrpc:fault exn:xmlrpc (code))
+(struct exn:xml-rpc:fault exn:xml-rpc (code))
 
-(define-syntax raise-exn:xmlrpc
+(define-syntax raise-exn:xml-rpc
   (syntax-rules ()
     ((_ message)
      (raise
-      (exn:xmlrpc
+      (exn:xml-rpc
        (string->immutable-string message)
        (current-continuation-marks))))))
+
+(provide/contract
+ [struct (exn:xml-rpc exn) 
+         ([message string?] [continuation-marks continuation-mark-set?])]
+ [struct (exn:xml-rpc:fault exn:xml-rpc) 
+         ([message string?] [continuation-marks continuation-mark-set?] [code integer?])])

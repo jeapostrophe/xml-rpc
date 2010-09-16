@@ -10,13 +10,13 @@
          "base.rkt"
          "serialise.rkt")
 
-(provide encode-xmlrpc-call
-         write-xmlrpc-call
-         make-xmlrpc-call
-         read-xmlrpc-response
-         decode-xmlrpc-response
+(provide encode-xml-rpc-call
+         write-xml-rpc-call
+         make-xml-rpc-call
+         read-xml-rpc-response
+         decode-xml-rpc-response
          ;; Server-side
-         decode-xmlrpc-call
+         decode-xml-rpc-call
          (struct-out rpc-call))
 
 ;; http-200? : string -> (U #t #f)
@@ -31,8 +31,8 @@
       #t
       #f))
 
-;; encode-xmlrpc-call : string any ... -> sxml
-(define (encode-xmlrpc-call method-name . args)
+;; encode-xml-rpc-call : string any ... -> sxml
+(define (encode-xml-rpc-call method-name . args)
   `(methodCall
     (methodName ,method-name)
     (params
@@ -40,8 +40,8 @@
               `(param ,(serialise val)))
             args))))
 
-;; write-xmlrpc-call-headers : sxml output-port -> #t
-(define (write-xmlrpc-call call op)
+;; write-xml-rpc-call-headers : sxml output-port -> #t
+(define (write-xml-rpc-call call op)
   (parameterize
       ((xml-double-quotes-mode #t))
     (let ([result
@@ -53,29 +53,29 @@
       result)))
 
 ;; WARNING 20060711 MCJ
-;; Given a bad hostname, make-xmlrpc-call could fail. Should we 
+;; Given a bad hostname, make-xml-rpc-call could fail. Should we 
 ;; catch that and pass it on as an XML-RPC exception, 
 ;; or leave it to the developer?
 #| tcp-connect: connection to locahost, port 8080 failed; host not found (at step 1: No address associated with nodename; errno=7) |#
-;; make-xmlrpc-call : url sxml -> impure-port
-(define (make-xmlrpc-call url call)
+;; make-xml-rpc-call : url sxml -> impure-port
+(define (make-xml-rpc-call url call)
   (let ((op (open-output-bytes)))
-    (write-xmlrpc-call call op)
+    (write-xml-rpc-call call op)
     (post-impure-port url
                       (get-output-bytes op)
                       '("Content-Type: text/xml"
                         "User-Agent: Racket"))))
 
-;; read-xmlrpc-response : input-port -> sxml
-(define (read-xmlrpc-response ip)
+;; read-xml-rpc-response : input-port -> sxml
+(define (read-xml-rpc-response ip)
   (let ((headers (purify-port ip)))
     ;; Expanding the quality of error message supplied to the 
     ;; programmer developing with the XML-RPC library.
     (cond
       [(http-404? headers)
-       (raise-exn:xmlrpc "Server responded with a 404: File not found")]
+       (raise-exn:xml-rpc "Server responded with a 404: File not found")]
       [(not (http-200? headers))
-       (raise-exn:xmlrpc  
+       (raise-exn:xml-rpc  
         (format "Server did not respond with an HTTP 200~nHeaders:~n~a~n"
                 headers))])
     ;; 20060731 MCJ
@@ -85,22 +85,22 @@
       (close-input-port ip)
       response) ))
 
-;; decode-xmlrpc-response : input-port -> any
-(define (decode-xmlrpc-response ip)
-  (let ((resp (read-xmlrpc-response ip)))
+;; decode-xml-rpc-response : input-port -> any
+(define (decode-xml-rpc-response ip)
+  (let ((resp (read-xml-rpc-response ip)))
     (xml-match (xml-document-content resp)
                [(methodResponse (params (param ,value)))
                 (deserialise value)]
                [(methodResponse (fault ,value))
                 (let ((h (deserialise value)))
                   (raise
-                   (exn:xmlrpc:fault
+                   (exn:xml-rpc:fault
                     (string->immutable-string
                      (hash-ref h 'faultString))
                     (current-continuation-marks)
                     (hash-ref h 'faultCode))))]
                [,else
-                (raise-exn:xmlrpc
+                (raise-exn:xml-rpc
                  (format "Received invalid XMLRPC response ~a\n" else))])))
 
 
@@ -111,25 +111,25 @@
          (xml-match p
                     [(param ,value) (deserialise value)]
                     [,else
-                     (raise-exn:xmlrpc
+                     (raise-exn:xml-rpc
                       (format "Bad parameter in methodCall: ~a~n" p))]))
        param*))
 
-;; read-xmlrpc-response : string -> sxml
-(define (read-xmlrpc-call str)
+;; read-xml-rpc-response : string -> sxml
+(define (read-xml-rpc-call str)
   (let* ([call-ip (open-input-string str)]
          [result (ssax:ssax:xml->sxml call-ip '())])
     (close-input-port call-ip)
     result))
 
-;; decode-xmlrpc-call : string -> any
+;; decode-xml-rpc-call : string -> any
 (define-struct rpc-call (name args))
-(define (decode-xmlrpc-call str)
-  (let ([docu (read-xmlrpc-call str)])
+(define (decode-xml-rpc-call str)
+  (let ([docu (read-xml-rpc-call str)])
     (xml-match (xml-document-content docu)
                [(methodCall (methodName ,name) (params ,param* ...))
                 (let ([value* (extract-parameter-values param*)])
                   (make-rpc-call (string->symbol name) value*))]
                [,else
-                (raise-exn:xmlrpc
+                (raise-exn:xml-rpc
                  (format "Cannot parse methodCall: ~a~n" else))])))
