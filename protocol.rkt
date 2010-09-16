@@ -94,7 +94,7 @@
                [(methodResponse (fault ,value))
                 (let ((h (deserialise value)))
                   (raise
-                   (make-exn:xmlrpc:fault
+                   (exn:xmlrpc:fault
                     (string->immutable-string
                      (hash-ref h 'faultString))
                     (current-continuation-marks)

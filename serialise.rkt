@@ -1,7 +1,8 @@
 #lang racket
-(require jim/webit:1:4/xml
+(require (planet jim/webit:1:4/xml)
          (only-in net/base64 base64-decode)
-         "util.rkt"
+         (only-in "tests/util.rkt" base64-encode)
+         racket/date
          "base.rkt")
 
 (provide serialise
@@ -28,19 +29,19 @@
 (define identity
   (lambda (x) x))
 
-(c:define/contract encode-string-guard
-                   (c:-> boolean? any)
-                   (lambda (replace?)
-                     (if replace?
-                         replace-&-and-<
-                         identity)))
+(define/contract encode-string-guard
+  (-> boolean? any)
+  (lambda (replace?)
+    (if replace?
+        replace-&-and-<
+        identity)))
 
-(c:define/contract decode-string-guard
-                   (c:-> boolean? any)
-                   (lambda (replace?)
-                     (if replace?
-                         replace-entities
-                         identity)))
+(define/contract decode-string-guard
+  (-> boolean? any)
+  (lambda (replace?)
+    (if replace?
+        replace-entities
+        identity)))
 
 (define encode-string
   (make-parameter replace-&-and-< encode-string-guard))
@@ -136,8 +137,8 @@
 
 (define (deserialize-iso8601 v)
   ;;<value><dateTime.iso8601>20051030T22:29:34</dateTime.iso8601></value>
-  (let ([pieces (pregexp-match 
-                 "(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)T(\\d\\d):(\\d\\d):(\\d\\d)" v)])
+  (let ([pieces (regexp-match 
+                 #px"(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)T(\\d\\d):(\\d\\d):(\\d\\d)" v)])
     (if pieces
         (let-values ([(all year month day h m s)
                       (apply values (map string->number pieces))])

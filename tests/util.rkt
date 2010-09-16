@@ -2,7 +2,7 @@
 (require rackunit
          (only-in net/base64 base64-encode-stream)
          ;; For dealing with serialised hash tables.
-         (only-in (planet lizorkin/sxml:2:0/sxml sxpath)))
+         (only-in (planet lizorkin/sxml:2:0/sxml) sxpath))
 
 (provide (all-defined-out))
 
@@ -148,7 +148,7 @@
                      (format "No value found with key ~e" key)))
                  (fail-check))))))
        (if (and (hash? v1) (hash? v2))
-           (check-hash-table-equal?* v1 v2)
+           (check-hash-table-equal? v1 v2)
            (check-equal? v1 v2))))))
 
 ;; base64-encode : bytes -> string

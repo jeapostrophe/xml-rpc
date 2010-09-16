@@ -234,7 +234,7 @@
     "base64 encoded correctly"
     (check-invertible
      #"Racket Rules!"
-     '(value (base64 "U2NoZW1lIFJ1bGVzIQ=="))))
+     '(value (base64 "UmFja2V0IFJ1bGVzIQ=="))))
    
    ))
 ;; end of invertible-tests

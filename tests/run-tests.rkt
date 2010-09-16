@@ -4,4 +4,4 @@
 
 (print-struct #t)
 
-(test/text-ui all-xmlrpc-tests)
+(run-tests all-xmlrpc-tests)

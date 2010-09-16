@@ -11,6 +11,6 @@
   (syntax-rules ()
     ((_ message)
      (raise
-      (make-exn:xmlrpc
+      (exn:xmlrpc
        (string->immutable-string message)
        (current-continuation-marks))))))

@@ -13,7 +13,7 @@
     [(host port path)
      (let ([url (string->url
                  (format "http://~a:~a/~a" host port path))])
-       (xmlrpc-server url))]
+       (xml-rpc-server url))]
     [(url)
      (lambda (method-name)
        (lambda args

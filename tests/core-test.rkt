@@ -8,7 +8,7 @@
 (provide core-tests)
 
 (define betty 
-  (xmlrpc-server
+  (xml-rpc-server
    (string->url "http://betty.userland.com/RPC2")))
 
 (define get-state-name (betty "examples.getStateName"))
@@ -29,7 +29,7 @@
    (test-case
     "xmlrpc-server accepts host port and path"
     (let* ((betty
-            (xmlrpc-server "betty.userland.com" 80 "RPC2"))
+            (xml-rpc-server "betty.userland.com" 80 "RPC2"))
            (get-state-name (betty "examples.getStateName")))
       (with-timeout 
           "Server accepts host/port/path times out." RPC-TIMEOUT
