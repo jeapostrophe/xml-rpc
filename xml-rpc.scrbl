@@ -18,7 +18,7 @@
 
 @defmodule/this-package[]
 
-@margin-note{This package is based on the XML-RPC package by Matt Jadud and Noel Welsh}
+@margin-note{This package is based on the XML-RPC package by Matt Jadud and Noel Welsh of Untyped}
 
 This library implements the XML-RPC protocol, a popular protocol for interface to Internet
 services such as blog engines, as specified at
