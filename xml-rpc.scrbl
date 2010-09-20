@@ -72,7 +72,15 @@ hash table.
             'math.+ +
             'addFun add)))
  (define (run-server!)
-   (serve/servlet xml-rpc-adder))]
+   (serve/servlet xml-rpc-adder
+                  #:port 8080
+                  #:servlet-path "/"
+                  #:command-line? #t))
+ (define (test-server)
+   (define adder 
+     (xml-rpc-server (string->url "http://localhost:8080/")))
+   (define math.add (adder 'math.add))
+   (math.add 3 4))]
 
 }
 
