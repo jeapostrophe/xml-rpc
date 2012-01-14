@@ -1,8 +1,7 @@
-#lang racket
+#lang racket/base
 (require rackunit
-         (only-in net/base64 base64-encode-stream)
-         ;; For dealing with serialised hash tables.
-         (only-in (planet lizorkin/sxml:2:0/sxml) sxpath))
+         (for-syntax racket/base)
+         (only-in net/base64 base64-encode-stream))
 
 (provide (all-defined-out))
 
@@ -81,8 +80,8 @@
 ;; Therefore, I'll pull them apart like the lists that they are, and
 ;; run some checks over the names and values.
 (define-check (check-serialised-hash-table-equal? sxml1 sxml2)
-  (define (extract-names sxml) ((sxpath '(// name)) sxml))
-  (define (extract-values sxml) ((sxpath '(// value)) sxml))
+  (define (extract-names sxml) ((error 'sxpath '(// name)) sxml))
+  (define (extract-values sxml) ((error 'sxpath '(// value)) sxml))
   (let ([names1 (extract-names sxml1)]
         [names2 (extract-names sxml2)]
         [values1 (extract-values sxml1)]

@@ -1,4 +1,5 @@
-#lang racket
+#lang racket/base
+(require racket/contract)
 (provide raise-exn:xml-rpc)
 
 (struct exn:xml-rpc exn ())

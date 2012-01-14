@@ -1,5 +1,5 @@
-#lang racket
-(require (planet jim/webit:1:4/xml)
+#lang racket/base
+(require racket/contract
          (only-in net/base64 base64-decode)
          (only-in "tests/util.rkt" base64-encode)
          racket/date
@@ -119,7 +119,8 @@
   (let ([h (make-hash)])
     (for-each
      (lambda (member)
-       (xml-match member
+       (error 'deserialise-struct "~v" member)
+       #;(xml-match member
                   ;; They may have shipped the empty string; this is optionally encoded
                   ;; as (value) in the API. Perhaps we should deserialize this differently?
                   ;; Either way, this is a quick fix for the problem.
@@ -153,7 +154,8 @@
 
 ;; deserialise : sxml -> (U float boolean integer string date hash list)
 (define (deserialise val)
-  (xml-match val
+  (error 'deserialise "~v" val)
+  #;(xml-match val
              ;; Our struct deserialiser can dump here with a bare string.
              ;; We need to guard against that and simply return the string.
              [,bare-string (guard (string? bare-string)) bare-string]

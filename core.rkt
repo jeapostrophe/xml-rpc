@@ -1,5 +1,6 @@
-#lang racket
+#lang racket/base
 (require net/url
+         racket/contract
          "protocol.rkt")
 
 (provide/contract

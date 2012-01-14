@@ -1,12 +1,6 @@
-#lang racket
-(require (planet jim/webit:1:4/xml)
-         (planet lshift/xxexpr:1/xxexpr)
+#lang racket/base
+(require xml
          net/url
-         ;; 20060711 MCJ
-         ;; It would appear that a PLaneT require would be 
-         ;; more appropriate here
-         ;;(lib "ssax.ss" "ssax")
-         (prefix-in ssax: (planet lizorkin/ssax:2:0/ssax))
          "base.rkt"
          "serialise.rkt")
 
@@ -41,11 +35,13 @@
             args))))
 
 ;; write-xml-rpc-call-headers : sxml output-port -> #t
+(require racket/pretty)
 (define (write-xml-rpc-call call op)
   (parameterize
-      ((xml-double-quotes-mode #t))
+   ; XXX
+      (#;(xml-double-quotes-mode #t))
     (let ([result
-           (pretty-print-xxexpr (list '(*pi* xml (version "1.0"))
+           (pretty-print (list '(*pi* xml (version "1.0"))
                                       call) op)])
       ;; We don't need to close this port; it's an
       ;; 'ouput-bytes' port. Oops. Closing this breaks things.
@@ -81,14 +77,15 @@
     ;; 20060731 MCJ
     ;; This input port doesn't seem to get closed. Or, 
     ;; if it does, I don't know where. We'll find out.
-    (let ([response (ssax:ssax:xml->sxml ip '())])
+    (let ([response (read-xml ip)])
       (close-input-port ip)
       response) ))
 
 ;; decode-xml-rpc-response : input-port -> any
 (define (decode-xml-rpc-response ip)
   (let ((resp (read-xml-rpc-response ip)))
-    (xml-match (xml-document-content resp)
+    (error 'decode-xml-rpc-response "~v" resp)
+    #;(xml-match (xml-document-content resp)
                [(methodResponse (params (param ,value)))
                 (deserialise value)]
                [(methodResponse (fault ,value))
@@ -108,7 +105,8 @@
 ;; extract-parameter-values : (list-of `(param ,v)) -> any
 (define (extract-parameter-values param*)
   (map (lambda (p)
-         (xml-match p
+         (error 'xml-match "~v" p)
+         #;(xml-match p
                     [(param ,value) (deserialise value)]
                     [,else
                      (raise-exn:xml-rpc
@@ -118,7 +116,7 @@
 ;; read-xml-rpc-response : string -> sxml
 (define (read-xml-rpc-call str)
   (let* ([call-ip (open-input-string str)]
-         [result (ssax:ssax:xml->sxml call-ip '())])
+         [result (read-xml call-ip)])
     (close-input-port call-ip)
     result))
 
@@ -126,7 +124,8 @@
 (define-struct rpc-call (name args))
 (define (decode-xml-rpc-call str)
   (let ([docu (read-xml-rpc-call str)])
-    (xml-match (xml-document-content docu)
+    (error 'xml-match "~v" docu)
+    #;(xml-match (xml-document-content docu)
                [(methodCall (methodName ,name) (params ,param* ...))
                 (let ([value* (extract-parameter-values param*)])
                   (make-rpc-call (string->symbol name) value*))]

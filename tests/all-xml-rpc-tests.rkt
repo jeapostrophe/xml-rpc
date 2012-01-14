@@ -1,4 +1,4 @@
-#lang racket
+#lang racket/base
 (require rackunit
          "serialise-test.rkt"
          "protocol-test.rkt"

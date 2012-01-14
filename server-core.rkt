@@ -1,4 +1,4 @@
-#lang racket
+#lang racket/base
 (require web-server/servlet
          "serialise.rkt"
          "protocol.rkt"
@@ -47,7 +47,7 @@
               ;; around this?
               ,serialised-result)))]
          [output (string->bytes/utf-8 (xexpr->string response))])
-    (make-response/full 
+    (response/full 
      200 #"Okay" (current-seconds) 
      #"text/xml" '() 
      (list output))))

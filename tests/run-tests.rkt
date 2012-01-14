@@ -1,4 +1,4 @@
-#lang racket
+#lang racket/base
 (require rackunit/text-ui)
 (require "all-xml-rpc-tests.ss")
 
