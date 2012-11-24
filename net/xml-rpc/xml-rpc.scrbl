@@ -1,6 +1,5 @@
 #lang scribble/doc
-@(require unstable/scribble
-          (for-label "main.rkt"
+@(require (for-label net/xml-rpc
                      net/url
                      web-server/http
                      web-server/servlet-env
@@ -10,13 +9,13 @@
 
 @(define xml-rpc-eval
    (make-base-eval))
-@(xml-rpc-eval '(require "main.rkt"))
+@(xml-rpc-eval '(require net/xml-rpc))
 @(xml-rpc-eval '(require net/url))
 
 @title{XML-RPC}
 @author{@(author+email "Jay McCarthy" "jay@racket-lang.org")}
 
-@defmodule/this-package[]
+@defmodule[net/xml-rpc]
 
 @margin-note{This package is based on the XML-RPC package by Matt Jadud and Noel Welsh of Untyped}
 
@@ -27,7 +26,7 @@ services such as blog engines, as specified at
 
 @section{Clients}
 
-@defmodule/this-package[client]
+@defmodule[net/xml-rpc/client]
 
 The client library provides a few forms for defining servers and
 their supported endpoints.
@@ -53,7 +52,7 @@ This example calls the @litchar{examples.getStateName} method on the server
 
 @section{Servers}
 
-@defmodule/this-package[server]
+@defmodule[net/xml-rpc/server]
 
 The server library provides 
 

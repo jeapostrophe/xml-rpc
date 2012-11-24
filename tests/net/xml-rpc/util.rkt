@@ -1,5 +1,6 @@
 #lang racket/base
 (require rackunit
+         racket/list
          (for-syntax racket/base)
          (only-in net/base64 base64-encode-stream))
 
@@ -80,8 +81,12 @@
 ;; Therefore, I'll pull them apart like the lists that they are, and
 ;; run some checks over the names and values.
 (define-check (check-serialised-hash-table-equal? sxml1 sxml2)
-  (define (extract-names sxml) ((error 'sxpath '(// name)) sxml))
-  (define (extract-values sxml) ((error 'sxpath '(// value)) sxml))
+  (define (extract-names sxml)
+    (map (λ (x) (second (second x)))
+         (rest (second sxml))))
+  (define (extract-values sxml)
+    (map (λ (x) (second (third x)))
+         (rest (second sxml))))
   (let ([names1 (extract-names sxml1)]
         [names2 (extract-names sxml2)]
         [values1 (extract-values sxml1)]
@@ -118,7 +123,7 @@
           [h2 (make-hash)])
       (define (load-hash h lon lov)
         (for-each (lambda (n v)
-                    (hash-set! h (string->symbol (cadr n)) v))
+                    (hash-set! h (string->symbol n) v))
                   lon lov))
       (load-hash h1 names1 values1)
       (load-hash h2 names2 values2)
@@ -150,11 +155,3 @@
            (check-hash-table-equal? v1 v2)
            (check-equal? v1 v2))))))
 
-;; base64-encode : bytes -> string
-(define (base64-encode byte)
-  (let ((output (open-output-string)))
-    (base64-encode-stream
-     (open-input-bytes byte)
-     output
-     #"")
-    (get-output-string output)))

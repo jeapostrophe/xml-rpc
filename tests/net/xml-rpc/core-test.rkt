@@ -1,8 +1,7 @@
 #lang racket/base
-
 (require rackunit
          net/url
-         "../core.ss"
+         net/xml-rpc/core
          "util.ss")
 
 (provide core-tests)

@@ -3,8 +3,8 @@
          racket/match
          net/url
          web-server/servlet-env
-         "../client.rkt"
-         "../server.rkt")
+         net/xml-rpc/client
+         net/xml-rpc/server)
 
 (provide server-tests)
 

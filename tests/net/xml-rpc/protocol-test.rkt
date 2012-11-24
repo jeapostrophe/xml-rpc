@@ -1,67 +1,23 @@
 #lang racket/base
-
 (require rackunit
          net/url
-         "../protocol.rkt"
-         "../base.rkt"
+         net/xml-rpc/protocol
+         net/xml-rpc/base
          "util.rkt")
 
 (provide protocol-tests)
 
 (define body-string
-  "<?xml version=\"1.0\"?>
-<methodCall>
-    <methodName>fooBar</methodName>
-    <params>
-        <param>
-            <value>
-                <int>1</int>
-            </value>
-        </param>
-        <param>
-            <value>
-                <double>2.0</double>
-            </value>
-        </param>
-        <param>
-            <value>
-                <string>3</string>
-            </value>
-        </param>
-    </params>
-</methodCall>")
+  "<?xml version=\"1.0\"?><methodCall><methodName>fooBar</methodName><params><param><value><int>1</int></value></param><param><value><double>2.0</double></value></param><param><value><string>3</string></value></param></params></methodCall>")
 
 (define generic-headers
   "HTTP/1.1 200 OK\r\nContent-Type:text/xml\r\n\r\n")
 
 (define fault-response-string
-  "<?xml version=\"1.0\"?>
-<methodResponse>
-   <fault>
-      <value>
-         <struct>
-            <member>
-               <name>faultCode</name>
-               <value><int>4</int></value>
-               </member>
-            <member>
-               <name>faultString</name>
-               <value><string>Too many parameters.</string></value>
-               </member>
-            </struct>
-         </value>
-      </fault>
-   </methodResponse>")
+  "<?xml version=\"1.0\"?><methodResponse><fault><value><struct><member><name>faultCode</name><value><int>4</int></value></member><member><name>faultString</name><value><string>Too many parameters.</string></value></member></struct></value></fault></methodResponse>")
 
 (define successful-response-string
-  "<?xml version=\"1.0\"?>
-<methodResponse>
-  <params>
-    <param>
-      <value><string>Hello!</string></value>
-    </param>
-  </params>
-</methodResponse>")
+  "<?xml version=\"1.0\"?><methodResponse><params><param><value><string>Hello!</string></value></param></params></methodResponse>")
 
 
 (define protocol-tests
@@ -106,17 +62,15 @@
              (string-append generic-headers
                             fault-response-string)))))
       (check-equal?
-       '(*TOP*
-         (*PI* xml "version=\"1.0\"")
-         (methodResponse
-          (fault
-           (value
-            (struct
-             (member (name "faultCode")
-                     (value (int "4")))
-             (member (name "faultString")
-                     (value (string "Too many parameters."))))))))
-       resp)))
+       resp
+       '(methodResponse
+         (fault
+          (value
+           (struct
+            (member (name "faultCode") (value (int "4")))
+            (member
+             (name "faultString")
+             (value (string "Too many parameters."))))))))))
    (test-case
     "Successful response is parsed correctly"
     (let ((resp
@@ -125,13 +79,9 @@
              (string-append generic-headers
                             successful-response-string)))))
       (check-equal?
-       '(*TOP*
-         (*PI* xml "version=\"1.0\"")
-         (methodResponse
-          (params
-           (param
-            (value (string "Hello!"))))))
-       resp)))
+       resp
+       '(methodResponse
+         (params (param (value (string "Hello!"))))))))
    (test-case
     "Successful response decoded correctly"
     (check-equal?
