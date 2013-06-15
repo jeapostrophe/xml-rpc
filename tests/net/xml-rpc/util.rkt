@@ -81,59 +81,60 @@
 ;; Therefore, I'll pull them apart like the lists that they are, and
 ;; run some checks over the names and values.
 (define-check (check-serialised-hash-table-equal? sxml1 sxml2)
-  (define (extract-names sxml)
-    (map (λ (x) (second (second x)))
-         (rest (second sxml))))
-  (define (extract-values sxml)
-    (map (λ (x) (second (third x)))
-         (rest (second sxml))))
-  (let ([names1 (extract-names sxml1)]
-        [names2 (extract-names sxml2)]
-        [values1 (extract-values sxml1)]
-        [values2 (extract-values sxml2)])
-    
-    ;; Make sure both hash tables have the same number of elements 
-    ;; before proceeding.
-    (when (not (equal? (length names1) (length names2)))
-      (with-check-info
-          (('message "Hash tables have different numbers of elements."))
-        (fail-check)))
-    
-    ;; Check that both sets of keys are equal.
-    (unless (set-equal? names1 names2)
-      (with-check-info
-          (('message 
-            (format "First hash has different keys than second hash:~n\tH1: ~s~n\tH2 ~s~n"
-                    names1 names2)))
-        (fail-check)))
-    
-    ;; Do the same (unordered) check for values.
-    (unless (set-equal? values1 values2)
-      (with-check-info
-          (('message 
-            (format "First hash has different values than second hash:~n\tH1: ~s~n\tH2 ~s~n"
-                    values1 values2)))
-        (fail-check)))
-    
-    ;; And lastly, do a hash-table check on them... because I don't want to implement
-    ;; it using association lists. So, I'll load each of these lists of names and values
-    ;; into a hash table, and then use 'check-hash-table-equal?' on them. It's a bit
-    ;; of a cheat, and feels round-about... but it's a step.
-    (let ([h1 (make-hash)]
-          [h2 (make-hash)])
-      (define (load-hash h lon lov)
-        (for-each (lambda (n v)
-                    (hash-set! h (string->symbol n) v))
-                  lon lov))
-      (load-hash h1 names1 values1)
-      (load-hash h2 names2 values2)
+  (let ()
+    (define (extract-names sxml)
+      (map (λ (x) (second (second x)))
+           (rest (second sxml))))
+    (define (extract-values sxml)
+      (map (λ (x) (second (third x)))
+           (rest (second sxml))))
+    (let ([names1 (extract-names sxml1)]
+          [names2 (extract-names sxml2)]
+          [values1 (extract-values sxml1)]
+          [values2 (extract-values sxml2)])
       
-      (unless (check-hash-table-equal? h1 h2)
-        (with-check-info 
-            (('message "Serialised hash tables are not equal."))
-          (fail-check))))
-    
-    ))
+      ;; Make sure both hash tables have the same number of elements 
+      ;; before proceeding.
+      (when (not (equal? (length names1) (length names2)))
+        (with-check-info
+         (('message "Hash tables have different numbers of elements."))
+         (fail-check)))
+      
+      ;; Check that both sets of keys are equal.
+      (unless (set-equal? names1 names2)
+        (with-check-info
+         (('message 
+           (format "First hash has different keys than second hash:~n\tH1: ~s~n\tH2 ~s~n"
+                   names1 names2)))
+         (fail-check)))
+      
+      ;; Do the same (unordered) check for values.
+      (unless (set-equal? values1 values2)
+        (with-check-info
+         (('message 
+           (format "First hash has different values than second hash:~n\tH1: ~s~n\tH2 ~s~n"
+                   values1 values2)))
+         (fail-check)))
+      
+      ;; And lastly, do a hash-table check on them... because I don't want to implement
+      ;; it using association lists. So, I'll load each of these lists of names and values
+      ;; into a hash table, and then use 'check-hash-table-equal?' on them. It's a bit
+      ;; of a cheat, and feels round-about... but it's a step.
+      (let ([h1 (make-hash)]
+            [h2 (make-hash)])
+        (define (load-hash h lon lov)
+          (for-each (lambda (n v)
+                      (hash-set! h (string->symbol n) v))
+                    lon lov))
+        (load-hash h1 names1 values1)
+        (load-hash h2 names2 values2)
+        
+        (unless (check-hash-table-equal? h1 h2)
+          (with-check-info 
+           (('message "Serialised hash tables are not equal."))
+           (fail-check))))
+      
+      )))
 
 ;; check-hash-table-contains : hash-table hash-table -> void
 ;;
