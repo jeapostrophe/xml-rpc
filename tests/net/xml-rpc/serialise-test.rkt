@@ -73,7 +73,7 @@
 
   (test-case
    "Empty string serialised correctly"
-   (check-invertible "" '(value (string ""))))
+    (check-invertible "" '(value (string ""))))  
 
   (test-case
    "Doubles serialised correctly"
@@ -325,6 +325,11 @@
     (check-equal? (deserialise '(value "Foo"))
                   "Foo"))
 
+   (test-case
+       "nil deserialised correctly"
+     (check-equal? (deserialise '(nil))
+                  '()))
+   
    (test-case
     "Deserialisation of empty value defaults to empty string"
     (check-equal? (deserialise '(value))

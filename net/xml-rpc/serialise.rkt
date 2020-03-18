@@ -206,6 +206,9 @@
     ;; Arrays
     [(list 'array " " ... (list 'data value* ...) " " ...)
      (map deserialise (remove-single-spaces value*))]
+    ;; None values. As per
+    ;; https://web.archive.org/web/20130120074804/http://ontosys.com/xml-rpc/extensions.php
+    [(list 'nil) null]
     [else
      (raise-exn:xml-rpc
       (format "Cannot convert the XML-RPC type ~v to Racket" else))]))
