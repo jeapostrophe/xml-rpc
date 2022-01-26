@@ -3,6 +3,7 @@
          (only-in net/base64 base64-decode base64-encode-stream)
          racket/date
          racket/match
+         racket/string
          "base.rkt")
 
 (provide serialise
@@ -187,6 +188,7 @@
     ;; Strings
     [(list 'string " " ...) ""]
     [(list 'string " " ... v " " ...) v]
+    [(list 'string s ...) (string-trim (apply string-append s))]
 
     ;; Booleans
     [(list 'boolean " " ... v " " ...) (string=? v "1")]
